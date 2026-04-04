@@ -1,0 +1,339 @@
+/* 1. The Design System Variables */
+:root {
+  --color-lime: hsl(61, 70%, 52%);
+  --color-red: hsl(4, 69%, 50%);
+  --color-white: hsl(0, 0%, 100%);
+  --color-slate-100: hsl(202, 86%, 94%);
+  --color-slate-300: hsl(203, 41%, 72%);
+  --color-slate-500: hsl(200, 26%, 54%);
+  --color-slate-700: hsl(200, 24%, 40%);
+  --color-slate-900: hsl(202, 55%, 16%);
+}
+
+/* 2. The Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 62.5%; /* 1rem = 10px */
+}
+
+body {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 1.6rem; /* Sets base text back to 16px */
+  background-color: var(--color-slate-100);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.container {
+  background-color: var(--color-white);
+  border-radius: 1rem;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  max-width: 40rem;
+  width: 100%;
+}
+
+.left-side {
+  padding: 3.2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.header,
+.input-container {
+  margin-bottom: 2.4rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.header h1 {
+  color: var(--color-slate-900);
+  font-size: 2.4rem;
+}
+
+.header button {
+  background-color: transparent;
+  border: none;
+  color: var(--color-slate-500);
+  font-size: 1.6rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  width: max-content;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+label {
+  color: var(--color-slate-700);
+  font-size: 1.6rem;
+  font-weight: 500;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: stretch;
+  border: 2px solid var(--color-slate-300);
+  border-radius: 0.4rem;
+}
+
+.input-wrapper.error {
+  border-color: var(--color-red);
+}
+
+.input-wrapper.error > span {
+  background-color: var(--color-red);
+}
+
+.error-message {
+  color: var(--color-red);
+  font-size: 1.4rem;
+  max-height: 0;
+  overflow: hidden;
+  transform: translateY(-8px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.error-message.visible {
+  max-height: 50px;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+span {
+  color: var(--color-slate-500);
+  font-size: 1.4rem;
+  padding: 1rem;
+  background-color: var(--color-slate-100);
+  transition: all 0.3s ease;
+}
+
+/* When the wrapper has focus inside it, change the span's look */
+.input-wrapper:focus-within span {
+  background-color: var(--color-lime);
+  color: var(--color-slate-900);
+}
+
+input {
+  border: none;
+  padding: 1.2rem 1.6rem;
+  font-size: 1.6rem;
+  width: 100%;
+  font-family: inherit;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--color-lime);
+}
+
+input:focus {
+  outline: none;
+}
+
+/* Chrome, Safari, Edge, Opera  button displayed in input cause its a number input */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.2rem;
+  padding: 1.2rem 1.6rem;
+  border: 2px solid var(--color-slate-300);
+  border-radius: 0.4rem;
+  margin-bottom: 1.2rem;
+  cursor: pointer;
+  width: 100%;
+}
+
+.radio-option label {
+  flex: none;
+  width: auto;
+  margin: 0;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: var(--color-slate-900);
+  white-space: nowrap;
+}
+
+.radio-option input[type="radio"] {
+  width: 2rem;
+  height: 2rem;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.radio-option:has(input:checked) {
+  background-color: hsla(61, 70%, 52%, 0.15);
+  border-color: var(--color-lime);
+}
+
+.radio-option input[type="radio"]:checked {
+  border-color: var(--color-lime);
+  background-color: transparent; /* Keep the circle background transparent to show the inner dot */
+}
+
+.radio-option input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--color-slate-300);
+  border-radius: 50%;
+  cursor: pointer;
+  margin: 0;
+  flex-shrink: 0;
+
+  display: grid;
+  place-content: center;
+}
+
+.radio-option input[type="radio"]::before {
+  content: "";
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background-color: var(--color-lime);
+  transform: scale(0); /* Hidden */
+  transition: 0.1s transform ease-in-out;
+}
+
+.radio-option input[type="radio"]:checked::before {
+  transform: scale(1); /* Dot pops in! */
+}
+
+#calculate-btn {
+  background-color: var(--color-lime);
+  color: var(--color-slate-900);
+  border: none;
+  font-size: 1.6rem;
+  font-weight: 700;
+  padding: 1.6rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  border-radius: 100rem;
+}
+
+.right-side {
+  background-color: var(--color-slate-900);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 3.2rem;
+  text-align: center;
+  gap: 3rem;
+}
+
+.results-empty img {
+  width: 100%;
+  max-width: 20rem;
+}
+
+.result-title {
+  color: var(--color-slate-100);
+  font-size: 3.2rem;
+  margin-bottom: 1.2rem;
+}
+
+.result-text {
+  color: var(--color-slate-300);
+  font-size: 1.6rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.results-completed {
+  text-align: left;
+  display: none;
+}
+
+.result-card {
+  background-color: var(--color-slate-900);
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5);
+  color: var(--color-white);
+  padding: 2rem;
+  border-radius: 0.4rem;
+  margin-bottom: 1.5rem;
+  border-top: 5px solid var(--color-lime);
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.monthly-result {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.monthly-result p {
+  font-size: 1.6rem;
+  color: var(--color-slate-300);
+  font-weight: 700;
+}
+
+.monthly-result span {
+  font-size: 3.2rem;
+  color: var(--color-white);
+  font-weight: 700;
+  background: none;
+}
+
+.total-result {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.total-result p {
+  font-size: 1.6rem;
+  color: var(--color-slate-300);
+  font-weight: 700;
+}
+
+.total-result span {
+  font-size: 2.4rem;
+  color: var(--color-white);
+  font-weight: 700;
+  background: none;
+}

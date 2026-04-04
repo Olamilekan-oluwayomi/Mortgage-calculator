@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- displays site properly based on user's device -->
+
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./assets/images/favicon-32x32.png"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/queries.css" />
+
+    <title>Frontend Mentor | Mortgage repayment calculator</title>
+  </head>
+  <body>
+    <div class="container">
+      <form class="form left-side" novalidate>
+        <div class="header">
+          <h1 class="title">Mortgage Calculator</h1>
+          <button type="reset" class="clear-all">Clear All</button>
+        </div>
+
+        <div class="input-container">
+          <label for="amount">Mortgage Amount</label>
+          <div class="input-wrapper">
+            <span>£</span>
+            <input type="number" id="amount" required />
+          </div>
+          <p class="error-message">This field is required</p>
+        </div>
+
+        <div class="form-flex">
+          <div class="input-container">
+            <label for="term">Mortgage Term</label>
+            <div class="input-wrapper">
+              <input type="number" id="term" required />
+              <span>Years</span>
+            </div>
+            <p class="error-message">This field is required</p>
+          </div>
+
+          <div class="input-container">
+            <label for="interest">Interest Rate</label>
+            <div class="input-wrapper">
+              <input type="number" id="interest" step="0.01" required />
+              <span>%</span>
+            </div>
+            <p class="error-message">This field is required</p>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <label>Mortgage Type</label>
+
+          <div class="radio-option">
+            <input
+              type="radio"
+              id="repayment"
+              name="mortgage-type"
+              value="repayment"
+              required
+            />
+            <label for="repayment">Repayment</label>
+          </div>
+
+          <div class="radio-option">
+            <input
+              type="radio"
+              id="interest-only"
+              name="mortgage-type"
+              value="interest-only"
+            />
+            <label for="interest-only">Interest Only</label>
+          </div>
+          <p class="error-message radio-error">This field is required</p>
+        </div>
+
+        <button type="submit" id="calculate-btn">
+          <img src="assets/images/icon-calculator.svg" alt="Calculator icon" />
+          Calculate Repayments
+        </button>
+      </form>
+
+      <div class="right-side">
+        <div class="results-empty">
+          <img
+            src="assets/images/illustration-empty.svg"
+            alt="illustration of a empty box with a calculator and a pencil"
+            aria-hidden="true"
+          />
+          <h2 class="result-title">Results shown here</h2>
+          <p class="result-text">
+            Complete the form and click “calculate repayments” to see what your
+            monthly repayments would be.
+          </p>
+        </div>
+
+        <div class="results-completed">
+          <h2 class="result-title">Your results</h2>
+          <p class="result-text">
+            Your results are shown below based on the information you provided.
+            To adjust the results, edit the form and click “calculate
+            repayments” again.
+          </p>
+
+          <div class="result-card">
+            <div class="monthly-result">
+              <p>Your monthly repayments</p>
+              <span class="main-result">£0.00</span>
+            </div>
+
+            <hr />
+            <div class="total-result">
+              <p>Total you'll repay over the term</p>
+              <span class="secondary-result">£0.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
