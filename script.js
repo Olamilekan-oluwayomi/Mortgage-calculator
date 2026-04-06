@@ -7,6 +7,7 @@ const amountInput = document.getElementById("amount");
 const termInput = document.getElementById("term");
 const rateInput = document.getElementById("interest");
 const radioInputs = document.querySelectorAll('input[name="mortgage-type"]');
+const currencySelect = document.getElementById("currency");
 
 // Display Areas
 const emptyResults = document.querySelector(".results-empty");
@@ -71,6 +72,25 @@ clearBtn.addEventListener("click", function () {
 });
 
 */
+let currencySymbol = "£"; // Default to GBP
+
+const currencySymbols = {
+  GBP: "£",
+  USD: "$",
+  EUR: "€",
+};
+
+currencySelect.addEventListener("change", function () {
+  const selectedCurrency = this.value;
+
+  currencySymbol = currencySymbols[selectedCurrency] || "£"; // Fallback to GBP if something goes wrong
+
+  if (completedResults.style.display === "block") {
+    // results are visible, update the symbols
+    monthlyResultDisplay.textContent = `${currencySymbol}${monthlyResultDisplay.textContent.slice(1)}`;
+    totalResultDisplay.textContent = `${currencySymbol}${totalResultDisplay.textContent.slice(1)}`;
+  }
+});
 
 mortgageForm.addEventListener("submit", function (e) {
   e.preventDefault(); // Prevent form from submitting and refreshing the page
@@ -113,7 +133,7 @@ mortgageForm.addEventListener("submit", function (e) {
     mortgageTypeValue === "N/A" ||
     amount <= 0 ||
     term <= 0 ||
-    interest < 0
+    interest <= 0
   ) {
     return;
   }
@@ -140,8 +160,8 @@ mortgageForm.addEventListener("submit", function (e) {
   }
 
   // Display results
-  monthlyResultDisplay.textContent = `£${monthlyPayment.toFixed(2)}`;
-  totalResultDisplay.textContent = `£${totalPayment.toFixed(2)}`;
+  monthlyResultDisplay.textContent = `${currencySymbol}${monthlyPayment.toFixed(2)}`;
+  totalResultDisplay.textContent = `${currencySymbol}${totalPayment.toFixed(2)}`;
 
   // Show completed results and hide empty results
   emptyResults.style.display = "none";

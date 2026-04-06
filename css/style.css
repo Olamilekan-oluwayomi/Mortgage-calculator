@@ -105,6 +105,24 @@ label {
   background-color: var(--color-red);
 }
 
+.input-wrapper.error > span > select {
+  background-color: transparent;
+}
+
+#currency {
+  background-color: transparent;
+  border: none;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-slate-500);
+  padding: 2rem 1.6rem;
+  width: auto;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  appearance: none;
+}
+
 .error-message {
   color: var(--color-red);
   font-size: 1.4rem;
@@ -127,6 +145,25 @@ span {
   padding: 1rem;
   background-color: var(--color-slate-100);
   transition: all 0.3s ease;
+}
+
+#currency {
+  appearance: none;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-slate-500);
+  width: auto;
+  padding: 0;
+  cursor: pointer; /* Makes it feel interactive */
+  transition: color 0.3s ease; /* Transitions are smoother when specific */
+}
+
+#currency:hover {
+  color: var(--color-slate-900); /* Or whatever your dark/active color is */
 }
 
 /* When the wrapper has focus inside it, change the span's look */
