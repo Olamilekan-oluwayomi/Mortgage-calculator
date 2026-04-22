@@ -1,110 +1,84 @@
-// The Form and Clear Button (using classes since there are no IDs)
+// ============================================================
+// DOM REFERENCES
+// Grabbing elements from the HTML so we can read/update them
+// ============================================================
+
 const mortgageForm = document.querySelector(".form");
 const clearBtn = document.querySelector(".clear-all");
 
-// The Input Fields (using your specific IDs)
 const amountInput = document.getElementById("amount");
 const termInput = document.getElementById("term");
 const rateInput = document.getElementById("interest");
 const radioInputs = document.querySelectorAll('input[name="mortgage-type"]');
 const currencySelect = document.getElementById("currency");
 
-// Display Areas
 const emptyResults = document.querySelector(".results-empty");
 const completedResults = document.querySelector(".results-completed");
 
-// Result Spans
 const monthlyResultDisplay = document.querySelector(".main-result");
 const totalResultDisplay = document.querySelector(".secondary-result");
 
-/*
-// Event Listener for Form Submission
-mortgageForm.addEventListener("submit", function (e) {
-  e.preventDefault(); // Prevent form from submitting and refreshing the page
+// ============================================================
+// SHARED STATE
+// These are defined outside all event listeners so every
+// listener can read and update them (this is called "scope")
+// ============================================================
 
-  // Get input values and trim whitespace
-  const amountValue = parseFloat(amountInput.value.trim());
-  const termValue = parseFloat(termInput.value.trim());
-  const rateValue = parseFloat(rateInput.value.trim()) / 100; // Convert percentage to decimal
-
-  // Validate inputs
-  if (
-    isNaN(amountValue) ||
-    isNaN(termValue) ||
-    isNaN(rateValue) ||
-    amountValue <= 0 ||
-    termValue <= 0 ||
-    rateValue < 0
-  ) {
-    alert(
-      "Please enter valid positive numbers for Amount, Term, and Interest Rate.",
-    );
-    return;
-  }
-
-  // Calculate monthly payment using the formula: M = P[r(1+r)^n]/[(1+r)^n-1]
-  const monthlyRate = rateValue / 12;
-  const numberOfPayments = termValue * 12;
-  const monthlyPayment =
-    (amountValue * monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) /
-    (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
-
-  // Calculate total payment
-  const totalPayment = monthlyPayment * numberOfPayments;
-  // Display results
-  monthlyResultDisplay.textContent = `£${monthlyPayment.toFixed(2)}`;
-  totalResultDisplay.textContent = `£${totalPayment.toFixed(2)}`;
-
-  // Show completed results and hide empty results
-  emptyResults.style.display = "none";
-  completedResults.style.display = "block";
+// Intl.NumberFormat formats numbers as currency automatically
+// e.g. 1797.74 becomes £1,797.74 or $1,797.74
+// We use "let" so we can reassign it when the currency changes
+let currencyFormatter = new Intl.NumberFormat(navigator.language, {
+  style: "currency",
+  currency: "GBP", // default matches the dropdown's default option
 });
 
-// Event Listener for Clear Button
-clearBtn.addEventListener("click", function () {
-  // Clear input fields
-  amountInput.value = "";
-  termInput.value = "";
-  rateInput.value = "";
-  radioInputs.forEach((radio) => (radio.checked = false)); // Uncheck all radio buttons
-  emptyResults.style.display = "block";
-  completedResults.style.display = "none";
-});
+// Store the last calculated values outside so the currency
+// change listener can reformat them without recalculating
+let monthlyPayment = 0;
+let totalPayment = 0;
 
-*/
-let currencySymbol = "£"; // Default to GBP
-
-const currencySymbols = {
-  GBP: "£",
-  USD: "$",
-  EUR: "€",
-};
+// ============================================================
+// CURRENCY DROPDOWN
+// When the user changes currency, we:
+// 1. Rebuild the formatter with the new currency code
+// 2. If results are already showing, reformat them instantly
+// ============================================================
 
 currencySelect.addEventListener("change", function () {
-  const selectedCurrency = this.value;
+  // this.value is "GBP", "USD", or "EUR" from the dropdown
+  currencyFormatter = new Intl.NumberFormat(navigator.language, {
+    style: "currency",
+    currency: this.value,
+  });
 
-  currencySymbol = currencySymbols[selectedCurrency] || "£"; // Fallback to GBP if something goes wrong
-
+  // Only update the display if results are currently visible
   if (completedResults.style.display === "block") {
-    // results are visible, update the symbols
-    monthlyResultDisplay.textContent = `${currencySymbol}${monthlyResultDisplay.textContent.slice(1)}`;
-    totalResultDisplay.textContent = `${currencySymbol}${totalResultDisplay.textContent.slice(1)}`;
+    monthlyResultDisplay.textContent = currencyFormatter.format(monthlyPayment);
+    totalResultDisplay.textContent = currencyFormatter.format(totalPayment);
   }
 });
 
-mortgageForm.addEventListener("submit", function (e) {
-  e.preventDefault(); // Prevent form from submitting and refreshing the page
+// ============================================================
+// FORM SUBMISSION
+// Runs when the user clicks "Calculate Repayments"
+// ============================================================
 
+mortgageForm.addEventListener("submit", function (e) {
+  e.preventDefault(); // Stop the page from refreshing on submit
+
+  // Read and convert input values to numbers
   const amount = parseFloat(amountInput.value);
   const term = parseFloat(termInput.value);
   const interest = parseFloat(rateInput.value);
 
+  // Check which radio button is selected (repayment or interest-only)
   const mortgageType = document.querySelector(
     'input[name="mortgage-type"]:checked',
   );
   const mortgageTypeValue = mortgageType ? mortgageType.value : "N/A";
 
-  // error handling for invalid inputs
+  // ---- Validation ----
+  // Add error styles if any field is empty or invalid
 
   if (isNaN(amount) || amount <= 0) {
     amountInput.parentElement.classList.add("error");
@@ -125,7 +99,7 @@ mortgageForm.addEventListener("submit", function (e) {
     document.querySelector(".radio-error").classList.add("visible");
   }
 
-  // Stop execution if any field is invalid
+  // Stop here if anything is invalid — don't calculate
   if (
     isNaN(amount) ||
     isNaN(term) ||
@@ -138,74 +112,78 @@ mortgageForm.addEventListener("submit", function (e) {
     return;
   }
 
-  // Calculations
+  // ---- Calculations ----
 
-  const monthlyRate = interest / 100 / 12;
-  const numberOfPayments = term * 12;
-
-  let monthlyPayment;
-  let totalPayment;
+  const monthlyRate = interest / 100 / 12; // Convert annual % to monthly decimal
+  const numberOfPayments = term * 12; // Convert years to months
 
   if (mortgageTypeValue === "repayment") {
-    // your repayment formula goes here
-    // Calculate monthly payment using the formula: M = P[r(1+r)^n]/[(1+r)^n-1]
+    // Formula: M = P[r(1+r)^n] / [(1+r)^n - 1]
+    // P = principal, r = monthly rate, n = number of payments
     monthlyPayment =
       (amount * monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) /
       (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
 
     totalPayment = monthlyPayment * numberOfPayments;
   } else {
+    // Interest only: you only pay interest each month, not the principal
     monthlyPayment = amount * monthlyRate;
     totalPayment = monthlyPayment * numberOfPayments;
   }
 
-  // Display results
-  monthlyResultDisplay.textContent = `${currencySymbol}${monthlyPayment.toFixed(2)}`;
-  totalResultDisplay.textContent = `${currencySymbol}${totalPayment.toFixed(2)}`;
+  // ---- Display Results ----
+  // currencyFormatter.format() handles the symbol, commas, and decimals
+  monthlyResultDisplay.textContent = currencyFormatter.format(monthlyPayment);
+  totalResultDisplay.textContent = currencyFormatter.format(totalPayment);
 
-  // Show completed results and hide empty results
+  // Swap which panel is visible
   emptyResults.style.display = "none";
   completedResults.style.display = "block";
 });
 
-// Event Listener for Clear Button
+// ============================================================
+// CLEAR BUTTON
+// Resets the results panel and removes all error states
+// ============================================================
+
 clearBtn.addEventListener("click", function () {
-  // Clear input fields
   emptyResults.style.display = "block";
   completedResults.style.display = "none";
 
-  // Remove all error states
+  // Remove error highlight from all input wrappers
   document.querySelectorAll(".input-wrapper").forEach((wrapper) => {
     wrapper.classList.remove("error");
   });
 
-  // for loop version - same thing
-  // const wrappers = document.querySelectorAll(".input-wrapper");
-  // for (let i = 0; i < wrappers.length; i++) {
-  //   wrappers[i].classList.remove("error");
-
+  // Hide all error messages
   document.querySelectorAll(".error-message").forEach((msg) => {
     msg.classList.remove("visible");
   });
 });
 
-amountInput.addEventListener("input", function () {
+// ============================================================
+// INLINE VALIDATION
+// Remove error state as soon as the user starts typing.
+// clearError is defined once and reused across all inputs
+// (DRY principle - Don't Repeat Yourself)
+// "this" refers to whichever input triggered the event
+// ============================================================
+
+function clearError() {
   if (this.value.trim() !== "") {
     this.parentElement.classList.remove("error");
     this.parentElement.nextElementSibling.classList.remove("visible");
   }
+}
+
+// Attach the same function to all three inputs in one go
+[amountInput, termInput, rateInput].forEach((input) => {
+  input.addEventListener("input", clearError);
 });
 
-termInput.addEventListener("input", function () {
-  if (this.value.trim() !== "") {
-    this.parentElement.classList.remove("error");
-    this.parentElement.nextElementSibling.classList.remove("visible");
-  }
-});
-
-rateInput.addEventListener("input", function () {
-  if (this.value.trim() !== "") {
-    this.parentElement.classList.remove("error");
-    this.parentElement.nextElementSibling.classList.remove("visible");
-  }
+// Clear the radio error as soon as any option is selected
+radioInputs.forEach((radio) => {
+  radio.addEventListener("change", function () {
+    document.querySelector(".radio-error").classList.remove("visible");
+  });
 });
